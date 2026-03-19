@@ -16,3 +16,6 @@
 [submodule "GastroRoute_warehouse"]
 	path = GastroRoute_warehouse
 	url = git@github.com:Skillportru/GastroRoute_warehouse.git
+[submodule "GastroRoute_orders"]
+	path = GastroRoute_orders
+	url = git@github.com:Skillportru/GastroRoute_orders.git
