@@ -4,6 +4,56 @@ Base URL: `http://localhost:8000/api/v1`
 
 All responses use JSON format. Timestamps in ISO 8601.
 
+## Architecture Pattern
+
+All backend services follow a modular layered architecture (reference: `ai_chat_bot` template):
+
+```
+HTTP Request
+    ↓
+endpoints.py (HTTP declarations only)
+    ├── @router.get/post/patch/delete()
+    ├── response_model: Pydantic Schema
+    ├── summary, description
+    └── Depends(get_dal)
+    ↓
+actions.py (Business logic)
+    ├── Validates input
+    ├── Calls DAL methods
+    ├── Transforms DAL results to Schemas
+    └── Returns Pydantic Response
+    ↓
+dal.py (Database Access Layer)
+    ├── Database queries
+    ├── Returns raw dicts/ORM objects
+    └── No HTTP knowledge
+    ↓
+PostgreSQL Database
+```
+
+### Per-Service Module Structure
+
+```
+src/routers/v1/{service}/
+├── __init__.py           # Router export
+├── endpoints.py          # HTTP routes (request/response/validation)
+├── actions.py            # Business logic functions
+├── dal.py                # Database queries
+├── schemas.py            # Pydantic models (Request, Response)
+├── enums.py              # Service-specific enums (Status, Type, etc)
+├── summary.py            # Endpoint summary strings
+└── description.py        # Endpoint description strings
+```
+
+### Key Principles
+
+1. **Separation of Concerns**: endpoints ↔ actions ↔ dal → no mixing
+2. **Pydantic Only**: All HTTP responses are Pydantic models, never raw dicts
+3. **Explicit Dependencies**: All injections via `Depends()`
+4. **Error Handling**: HTTPException with proper status codes
+5. **Documentation**: Every endpoint has summary + description strings
+6. **Consistency**: All services follow identical pattern
+
 ## Identity Service (`/api/v1/identity`)
 
 ### POST /login
