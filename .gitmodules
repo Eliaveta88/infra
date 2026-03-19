@@ -1,0 +1,18 @@
+[submodule "GastroRoute_catalog"]
+	path = GastroRoute_catalog
+	url = git@github.com:Skillportru/GastroRoute_catalog.git
+[submodule "GastroRoute_finance"]
+	path = GastroRoute_finance
+	url = git@github.com:Skillportru/GastroRoute_finance.git
+[submodule "GastroRoute_frontend"]
+	path = GastroRoute_frontend
+	url = git@github.com:Skillportru/GastroRoute_frontend.git
+[submodule "GastroRoute_identity"]
+	path = GastroRoute_identity
+	url = git@github.com:Skillportru/GastroRoute_identity.git
+[submodule "GastroRoute_logistics"]
+	path = GastroRoute_logistics
+	url = git@github.com:Skillportru/GastroRoute_logistics.git
+[submodule "GastroRoute_warehouse"]
+	path = GastroRoute_warehouse
+	url = git@github.com:Skillportru/GastroRoute_warehouse.git
