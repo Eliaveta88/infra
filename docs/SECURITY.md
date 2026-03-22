@@ -58,13 +58,12 @@
 
 ### P0
 
-- Регулярно: **`pip audit`** / обновления **FastAPI** и транзитивных пакетов (**в CI:** `python -m pip_audit` по каждому Python-сервису).
+- Регулярно: **`pip audit`** / обновления **FastAPI** и транзитивных пакетов.
 - Прод: **HTTPS**, отключение insecure API Traefik, секреты не в git.
 
 ### P1
 
-- **Сделано в CI:** **Flutter** `analyze` + `test`, канал **stable**; проверка **`docker compose config`**; приватные субмодули: secret **`SUBMODULES_ACCESS_TOKEN`** (PAT с доступом к infra и всем `GastroRoute_*` репозиториям), см. комментарий в `.github/workflows/ci.yml`.
-- Держать **`sdk`** в `pubspec.yaml` в актуальном диапазоне относительно образа в CI.
+- Зафиксировать в CI репозиториев **frontend** / API (если настроен) версию **Dart/Flutter** (`sdk` в `pubspec.yaml`). В репозитории **infra** CI не используется.
 - Web: при необходимости усилить хранение сессии (см. таблицу выше).
 
 ### P2
@@ -82,4 +81,4 @@
 
 ---
 
-*Последнее обновление: CORS, Traefik dashboard на localhost, `.env.example`, CI (Flutter + pip-audit + compose).*
+*Последнее обновление: CORS, Traefik dashboard на localhost, `.env.example`.*
