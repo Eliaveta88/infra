@@ -83,9 +83,18 @@ def seed(account_count: int, tx_count: int, truncate: bool) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Заполнить finance.accounts и transactions")
-    p.add_argument("--accounts", type=int, default=10_000, help="Количество счетов (client_id 1..N)")
-    p.add_argument("--transactions", type=int, default=10_000, help="Количество транзакций")
-    p.add_argument("--truncate", action="store_true", help="TRUNCATE transactions и accounts")
+    p.add_argument(
+        "--accounts",
+        type=int,
+        default=10_000,
+        help="Количество счетов (client_id 1..N)",
+    )
+    p.add_argument(
+        "--transactions", type=int, default=10_000, help="Количество транзакций"
+    )
+    p.add_argument(
+        "--truncate", action="store_true", help="TRUNCATE transactions и accounts"
+    )
     args = p.parse_args()
     if args.transactions > 0 and args.accounts < 1:
         print("Нужен хотя бы 1 счёт для транзакций", file=sys.stderr)
