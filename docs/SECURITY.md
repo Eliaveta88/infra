@@ -17,6 +17,7 @@
 | JWT на мобильных | **`flutter_secure_storage`** |
 | JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF (отдельная задача) |
 | TLS / HTTPS | Не в dev compose; на проде — reverse-proxy или Traefik ACME (см. ниже) |
+| Трейсинг запросов (Traefik) | **OpenTelemetry** → Jaeger по OTLP gRPC (`jaeger:4317`); UI **http://127.0.0.1:16686/** только на localhost; access log JSON с полями **TraceId** / **SpanId** |
 | Сканирование образов / пентест | Рекомендуется на CI/стенде (Trivy и т.п.) |
 
 ---
@@ -79,7 +80,15 @@
 
 ---
 
-## 6. Что остаётся процессом эксплуатации
+## 6. Трейсинг (Traefik → Jaeger)
+
+Traefik экспортирует спаны в **Jaeger** по **OTLP gRPC** (`jaeger:4317`). В логах Traefik (stdout) access log в **JSON** содержит **TraceId** и **SpanId** для связки с Jaeger UI.
+
+Заголовки **W3C tracecontext** (`traceparent`) Traefik пробрасывает к upstream; чтобы микросервисы участвовали в одном трейсе, в них нужен совместимый OpenTelemetry/instrumentation (отдельная настройка в коде API).
+
+---
+
+## 7. Что остаётся процессом эксплуатации
 
 - Регулярный **`pip audit`** и обновления зависимостей в репозиториях API/фронта.
 - Сканирование образов (**Trivy** и аналоги), пентест API на стенде.
@@ -87,7 +96,7 @@
 
 ---
 
-## 7. Ссылки
+## 8. Ссылки
 
 - [Flutter Security](https://github.com/flutter/flutter/security)
 - [NVD](https://nvd.nist.gov/)
@@ -95,4 +104,4 @@
 
 ---
 
-*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`, актуализация статуса.*
+*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`, Jaeger OTLP + Traefik tracing/access log (TraceId/SpanId).*

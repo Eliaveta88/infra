@@ -4,6 +4,7 @@
 #   catalog → /catalog, finance → /finance, identity → /identity,
 #   warehouse → /warehouse, logistics → /logistics, orders → /orders
 # Дашборд Traefik: http://localhost:8080/dashboard/ (порт 8080 только на 127.0.0.1)
+# Трейсинг HTTP: OpenTelemetry → Jaeger OTLP; UI Jaeger: http://127.0.0.1:16686/ (только localhost)
 #
 # Переменные окружения: см. .env.example (реальные секреты — только в .env, не в git).
 #
@@ -25,11 +26,32 @@ services:
       - --providers.file.filename=/etc/traefik/dynamic.yml
       - --providers.file.watch=true
       - --entrypoints.web.address=:80
+      - --tracing=true
+      - --tracing.serviceName=gastroroute-traefik
+      - --tracing.otlp.grpc=true
+      - --tracing.otlp.grpc.endpoint=jaeger:4317
+      - --tracing.otlp.grpc.insecure=true
+      - --accesslog=true
+      - --accesslog.format=json
+    environment:
+      OTEL_PROPAGATORS: tracecontext,baggage
     ports:
       - "80:80"
       - "127.0.0.1:8080:8080"
     volumes:
       - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    depends_on:
+      jaeger:
+        condition: service_started
+    restart: unless-stopped
+
+  # OTLP (gRPC 4317) — приём спанов от Traefik; UI только на localhost.
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:16686:16686"
     restart: unless-stopped
 
   # Один контейнер Postgres, внутри — РАЗНЫЕ базы по доменам: catalog, finance, identity,
