@@ -30,7 +30,8 @@
 
 | Область | Риск | Рекомендация |
 |---------|------|--------------|
-| JWT в **SharedPreferences** | Токены не в защищённом хранилище на мобильных | Прод: **`flutter_secure_storage`** для refresh (и при необходимости access) |
+| JWT в **SharedPreferences** (web) | На Web токены в prefs — риск при XSS | Минимизация скриптов, CSP; для максимальной защиты web — отдельная схема (httpOnly cookie + BFF) |
+| JWT на **iOS/Android** | — | **Сделано:** **`flutter_secure_storage`** (Keychain / EncryptedSharedPreferences), миграция со старых prefs |
 | **CORS** | Было `allow_origins=["*"]` с `allow_credentials=True` (некорректная пара для браузеров) | **Реализовано:** список origin из **`CORS_ORIGINS`**, см. §4 |
 | **Traefik** | `--api.insecure=true`, порт **8080** | Прод: выключить insecure API, не публиковать дашборд наружу |
 | **HTTP** | В compose нет TLS | Прод: HTTPS (Traefik + сертификаты) |
@@ -62,8 +63,8 @@
 
 ### P1
 
-- Мобильный клиент: **secure storage** для токенов.
 - Зафиксировать в CI версию **Dart/Flutter** (`sdk` в `pubspec.yaml`).
+- Web: при необходимости усилить хранение сессии (см. таблицу выше).
 
 ### P2
 
