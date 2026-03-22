@@ -87,6 +87,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/finance
+      ORDERS_BASE_URL: http://orders:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
