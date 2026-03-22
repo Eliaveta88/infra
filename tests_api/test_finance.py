@@ -7,6 +7,7 @@ import uuid
 import pytest
 
 FINANCE_PREFIX = "/finance/api/v1/finance"
+ORDERS_PREFIX = "/orders/api/v1/orders"
 
 
 def test_revenue_summary_ok(client) -> None:
@@ -63,14 +64,26 @@ def test_get_balance_structure_when_exists(client) -> None:
 
 
 def test_generate_invoice(client) -> None:
+    """Uses a real order from the orders list + finance account for that client."""
+    r = client.get(f"{ORDERS_PREFIX}", params={"skip": 0, "limit": 20})
+    assert r.status_code == 200, r.text
+    items = r.json().get("items") or []
+    if not items:
+        pytest.skip("No orders — cannot test invoice generation end-to-end")
+    order = items[0]
+    client_id = order["client_id"]
+    order_id = order["id"]
+    b = client.get(f"{FINANCE_PREFIX}/accounts/{client_id}/balance")
+    if b.status_code == 404:
+        pytest.skip("No finance account for this client")
     r = client.post(
         f"{FINANCE_PREFIX}/invoices/generate",
-        json={"client_id": 42, "order_ids": [1, 2]},
+        json={"client_id": client_id, "order_ids": [order_id]},
     )
     assert r.status_code == 201, r.text
     data = r.json()
     assert "invoice_id" in data
-    assert data["client_id"] == 42
+    assert data["client_id"] == client_id
     assert "pdf_url" in data
     assert "created_at" in data
 

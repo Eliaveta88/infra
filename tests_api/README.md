@@ -49,12 +49,7 @@ pytest tests_api -v
 
 ### Finance: счёт (`POST /invoices/generate`)
 
-В коде исправлен ответ `_generate_invoice` (поле `created_at` и схема `InvoiceResponse`). Если контейнер `finance` собран со **старой** версией кода, этот тест даст **500**. Пересоберите образ:
-
-```bash
-docker compose build finance
-docker compose up -d finance
-```
+Генерация ходит в **orders** за деталями заказов и требует строку в `finance.accounts` для выбранного `client_id`. Тест берёт первый заказ из списка заказов и счёт для его `client_id`; если заказов нет или аккаунта нет — **skip**. Нужен `ORDERS_BASE_URL` у сервиса `finance` (в `docker-compose` задано).
 
 ## Структура
 
