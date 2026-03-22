@@ -9,6 +9,32 @@ import pytest
 FINANCE_PREFIX = "/finance/api/v1/finance"
 
 
+def test_revenue_summary_ok(client) -> None:
+    r = client.get(
+        f"{FINANCE_PREFIX}/accounts/1/revenue",
+        params={
+            "from": "2020-01-01T00:00:00+00:00",
+            "to": "2030-01-01T00:00:00+00:00",
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["client_id"] == 1
+    assert "total_amount" in body
+    assert body.get("currency") == "RUB"
+
+
+def test_revenue_summary_invalid_range(client) -> None:
+    r = client.get(
+        f"{FINANCE_PREFIX}/accounts/1/revenue",
+        params={
+            "from": "2030-01-01T00:00:00+00:00",
+            "to": "2020-01-01T00:00:00+00:00",
+        },
+    )
+    assert r.status_code == 422, r.text
+
+
 def test_list_transactions_empty_or_ok(client) -> None:
     r = client.get(
         f"{FINANCE_PREFIX}/transactions",
