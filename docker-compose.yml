@@ -117,6 +117,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/warehouse
+      CATALOG_BASE_URL: http://catalog:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
@@ -132,6 +133,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/logistics
+      IDENTITY_BASE_URL: http://identity:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
@@ -147,6 +149,8 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/orders
+      CATALOG_BASE_URL: http://catalog:8000
+      IDENTITY_BASE_URL: http://identity:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
