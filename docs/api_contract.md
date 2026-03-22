@@ -95,6 +95,13 @@ Get current authenticated user profile.
 }
 ```
 
+### GET /users/{user_id}
+Public profile by numeric user id (orders client label, logistics driver name). No authentication required in the reference deployment.
+
+**Response (200):** same shape as user object (no password).
+
+**404** if the user does not exist or is inactive.
+
 ### POST /logout
 Revoke current session.
 
