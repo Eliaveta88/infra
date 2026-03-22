@@ -63,7 +63,7 @@
 
 ### P1
 
-- **Сделано в CI:** **Flutter** `analyze` + `test`, канал **stable**; проверка **`docker compose config`**.
+- **Сделано в CI:** **Flutter** `analyze` + `test`, канал **stable**; проверка **`docker compose config`**; приватные субмодули: secret **`SUBMODULES_ACCESS_TOKEN`** (PAT с доступом к infra и всем `GastroRoute_*` репозиториям), см. комментарий в `.github/workflows/ci.yml`.
 - Держать **`sdk`** в `pubspec.yaml` в актуальном диапазоне относительно образа в CI.
 - Web: при необходимости усилить хранение сессии (см. таблицу выше).
 

@@ -1,13 +1,22 @@
 name: CI
 
+# Приватные субмодули: в настройках репозитория добавьте secret SUBMODULES_ACCESS_TOKEN —
+# classic PAT с scope «repo» или fine-grained с Contents: Read на infra и все GastroRoute_* репозитории.
+# Без него actions/checkout не сможет клонировать субмодули (GITHUB_TOKEN видит только текущий репозиторий).
+
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
 
+permissions:
+  contents: read
+
 jobs:
   flutter:
+    # На PR из fork секреты недоступны — без PAT субмодули не клонируются; job пропускаем.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -16,6 +25,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.SUBMODULES_ACCESS_TOKEN }}
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -25,6 +35,7 @@ jobs:
       - run: flutter test
 
   pip-audit:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -40,6 +51,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.SUBMODULES_ACCESS_TOKEN }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
