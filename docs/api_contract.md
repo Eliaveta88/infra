@@ -362,7 +362,7 @@ Create transaction with idempotency.
 ```
 
 ### POST /invoices/generate
-Generate invoice for order.
+Aggregate **orders** service data: loads each order by id via `GET /api/v1/orders/{id}`, checks `client_id` matches, sums `total_amount`, persists an **invoices** row. Requires a finance **account** for `client_id`.
 
 **Request:**
 ```json
@@ -376,10 +376,17 @@ Generate invoice for order.
 ```json
 {
   "invoice_id": "int",
-  "pdf_url": "string",
-  "status": "generated"
+  "client_id": "int",
+  "pdf_url": "string (API path to future PDF; see GET below)",
+  "status": "generated",
+  "created_at": "ISO 8601"
 }
 ```
+
+**Errors:** `404` if account missing; `400` if an order is missing or belongs to another client, or total is not positive; `503` if orders HTTP fails.
+
+### GET /invoices/{invoice_id}/pdf
+Reserved for PDF binary export. **501** until implemented.
 
 ---
 
