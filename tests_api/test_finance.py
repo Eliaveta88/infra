@@ -51,6 +51,17 @@ def test_get_balance_not_found_or_ok(client) -> None:
     assert r.status_code in (200, 404), r.text
 
 
+def test_get_balance_structure_when_exists(client) -> None:
+    r = client.get(f"{FINANCE_PREFIX}/accounts/1/balance")
+    if r.status_code == 404:
+        pytest.skip("No finance account for client_id=1")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert "balance" in body
+    assert "credit_limit" in body
+    assert body.get("currency") == "RUB"
+
+
 def test_generate_invoice(client) -> None:
     r = client.post(
         f"{FINANCE_PREFIX}/invoices/generate",

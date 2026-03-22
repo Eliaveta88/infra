@@ -39,7 +39,9 @@ pytest tests_api -v
 - **Warehouse / Logistics / Orders**: `GET .../api/v1/<service>/ping`.
 - **Catalog**: список, автодополнение, полный CRUD продукта.
 - **Identity**: регистрация → логин → `/users/me` → refresh → logout → второй пользователь → logout-all; негативный логин.
-- **Finance**: список транзакций, баланс (200 или 404), генерация счёта, создание транзакции и идемпотентность (если в БД есть аккаунт для `client_id=1`).
+- **Finance**: список транзакций, баланс (200 или 404), структура баланса при 200, выручка по периоду, генерация счёта, создание транзакции и идемпотентность (если в БД есть аккаунт для `client_id=1`).
+- **Orders**: список заказов; создание заказа с каталогом и identity (имя клиента и позиции); неизвестный товар → 400.
+- **Warehouse**: оприходование партии (`POST .../receive`) — имя товара в остатках совпадает с каталогом.
 
 ### Finance: транзакции
 
@@ -58,4 +60,4 @@ docker compose up -d finance
 
 - `conftest.py` — `API_BASE_URL`, `httpx.Client`, определение наличия finance-аккаунта.
 - `test_health_ready.py`, `test_ping_services.py` — смоук по всем сервисам.
-- `test_catalog.py`, `test_identity.py`, `test_finance.py` — сценарии по доменам.
+- `test_catalog.py`, `test_identity.py`, `test_finance.py`, `test_orders.py`, `test_warehouse.py` — сценарии по доменам.

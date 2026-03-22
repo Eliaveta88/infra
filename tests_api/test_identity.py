@@ -101,3 +101,24 @@ def test_login_invalid_credentials(client) -> None:
         json={"username": "definitely_not_a_user_12345", "password": "wrong"},
     )
     assert r.status_code in (401, 422)
+
+
+def test_get_user_by_id(client) -> None:
+    username, email, password = _unique_user()
+    r = client.post(
+        f"{IDENTITY_PREFIX}/users",
+        json={"username": username, "email": email, "password": password},
+    )
+    assert r.status_code == 201, r.text
+    uid = r.json()["id"]
+    r2 = client.get(f"{IDENTITY_PREFIX}/users/{uid}")
+    assert r2.status_code == 200, r2.text
+    body = r2.json()
+    assert body["id"] == uid
+    assert body["username"] == username
+    assert body["email"] == email
+
+
+def test_get_user_by_id_not_found(client) -> None:
+    r = client.get(f"{IDENTITY_PREFIX}/users/999999001")
+    assert r.status_code == 404, r.text
