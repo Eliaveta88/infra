@@ -32,22 +32,50 @@ def run(cmd: list[str]) -> None:
 def main() -> None:
     p = argparse.ArgumentParser(description="Запустить все seed_* скрипты")
     p.add_argument("--count", type=int, default=10_000)
-    p.add_argument("--truncate", action="store_true", help="TRUNCATE перед вставкой во всех сервисах")
+    p.add_argument(
+        "--truncate",
+        action="store_true",
+        help="TRUNCATE перед вставкой во всех сервисах",
+    )
     args = p.parse_args()
     c = args.count
     py = sys.executable
 
-    run([py, str(ROOT / "seed_catalog.py"), "--count", str(c)] + (["--truncate"] if args.truncate else []))
     run(
-        [py, str(ROOT / "seed_finance.py"), "--accounts", str(c), "--transactions", str(c)]
+        [py, str(ROOT / "seed_catalog.py"), "--count", str(c)]
         + (["--truncate"] if args.truncate else [])
     )
     run(
-        [py, str(ROOT / "seed_warehouse.py"), "--count", str(c), "--max-product-id", str(c)]
+        [
+            py,
+            str(ROOT / "seed_finance.py"),
+            "--accounts",
+            str(c),
+            "--transactions",
+            str(c),
+        ]
         + (["--truncate"] if args.truncate else [])
     )
     run(
-        [py, str(ROOT / "seed_orders.py"), "--count", str(c), "--max-product-id", str(c)]
+        [
+            py,
+            str(ROOT / "seed_warehouse.py"),
+            "--count",
+            str(c),
+            "--max-product-id",
+            str(c),
+        ]
+        + (["--truncate"] if args.truncate else [])
+    )
+    run(
+        [
+            py,
+            str(ROOT / "seed_orders.py"),
+            "--count",
+            str(c),
+            "--max-product-id",
+            str(c),
+        ]
         + (["--truncate"] if args.truncate else [])
     )
     run(
