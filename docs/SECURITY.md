@@ -84,7 +84,7 @@
 
 Traefik экспортирует спаны в **Jaeger** по **OTLP gRPC** (`jaeger:4317`). В логах Traefik (stdout) access log в **JSON** содержит **TraceId** и **SpanId** для связки с Jaeger UI.
 
-Заголовки **W3C tracecontext** (`traceparent`) Traefik пробрасывает к upstream; чтобы микросервисы участвовали в одном трейсе, в них нужен совместимый OpenTelemetry/instrumentation (отдельная настройка в коде API).
+Заголовки **W3C tracecontext** (`traceparent`) Traefik пробрасывает к upstream. Во всех Python API включены **OpenTelemetry** (FastAPI + OTLP gRPC в Jaeger, при наличии **httpx** — инструментирование исходящих вызовов).
 
 ---
 

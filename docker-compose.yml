@@ -109,7 +109,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-catalog
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -127,7 +131,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-finance
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -145,7 +153,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-identity
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -163,7 +175,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-warehouse
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -181,7 +197,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-logistics
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
@@ -200,7 +220,11 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
       REDIS_PASSWORD: ${REDIS_PASSWORD:-devredis}
+      OTEL_EXPORTER_OTLP_ENDPOINT: jaeger:4317
+      OTEL_SERVICE_NAME: gastroroute-orders
     depends_on:
+      jaeger:
+        condition: service_started
       postgres:
         condition: service_healthy
       redis:
