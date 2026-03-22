@@ -38,7 +38,9 @@ def seed(count: int, max_product_id: int, truncate: bool) -> None:
     try:
         with conn.cursor() as cur:
             if truncate:
-                cur.execute("TRUNCATE TABLE order_status_history RESTART IDENTITY CASCADE")
+                cur.execute(
+                    "TRUNCATE TABLE order_status_history RESTART IDENTITY CASCADE"
+                )
                 cur.execute("TRUNCATE TABLE order_items RESTART IDENTITY CASCADE")
                 cur.execute("TRUNCATE TABLE orders RESTART IDENTITY CASCADE")
 
@@ -85,7 +87,10 @@ def seed(count: int, max_product_id: int, truncate: bool) -> None:
     finally:
         conn.close()
 
-    print(f"orders: inserted {len(order_ids)} orders and {len(item_rows)} order_items", file=sys.stderr)
+    print(
+        f"orders: inserted {len(order_ids)} orders and {len(item_rows)} order_items",
+        file=sys.stderr,
+    )
 
 
 def main() -> None:
