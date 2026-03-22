@@ -28,7 +28,9 @@ def seed(count: int, max_product_id: int, truncate: bool) -> None:
         unit = random.choice(UNITS)
         expiry = now + timedelta(days=random.randint(30, 730))
         bref = f"GEN-BREF-{i:08d}"
-        status = random.choice(("in_stock", "partially_reserved", "fully_reserved", "expired"))
+        status = random.choice(
+            ("in_stock", "partially_reserved", "fully_reserved", "expired")
+        )
         batches_rows.append((product_id, qty, unit, expiry, bref, status))
 
     conn = psycopg2.connect(dsn)
@@ -65,7 +67,17 @@ def seed(count: int, max_product_id: int, truncate: bool) -> None:
             qrs = float(qty_rec) - qav
             cell = f"A-{random.randint(1, 99)}-{random.randint(1, 99)}"
             stock_rows.append(
-                (bid, pid, pname, round(qav, 2), round(max(0, qrs), 2), unit, cell, exp, bref)
+                (
+                    bid,
+                    pid,
+                    pname,
+                    round(qav, 2),
+                    round(max(0, qrs), 2),
+                    unit,
+                    cell,
+                    exp,
+                    bref,
+                )
             )
 
         with conn.cursor() as cur:
@@ -86,7 +98,10 @@ def seed(count: int, max_product_id: int, truncate: bool) -> None:
     finally:
         conn.close()
 
-    print(f"warehouse: inserted {count} batches and {len(stock_rows)} stock rows", file=sys.stderr)
+    print(
+        f"warehouse: inserted {count} batches and {len(stock_rows)} stock rows",
+        file=sys.stderr,
+    )
 
 
 def main() -> None:
