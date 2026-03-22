@@ -1,6 +1,23 @@
 # Безопасность GastroRoute
 
-Документ фиксирует известные риски (CVE/экосистема), находки по текущему коду и план мероприятий. Обновляйте при смене зависимостей или инфраструктуры.
+Документ фиксирует известные риски (CVE/экосистема), что уже сделано в коде и инфраструктуре, и что остаётся на стороне эксплуатации.
+
+---
+
+## Статус мер (кратко)
+
+| Тема | Состояние |
+|------|-----------|
+| CORS (`CORS_ORIGINS`) | Реализовано во всех API |
+| Traefik dashboard / API | Dev: порт **8080** только **127.0.0.1**; прод: `docker-compose.prod.yml` отключает dashboard и insecure API |
+| Заголовки ответа | Traefik: middleware **security-headers**; Flutter Web: заголовки в **nginx** |
+| Секреты БД / JWT | Через **`.env`** (шаблон **`.env.example`**) |
+| Redis | Пароль **`REDIS_PASSWORD`** (по умолчанию dev: `devredis`), одинаковый в redis и сервисах |
+| Starlette CVE-2025-62727 (Range) | Явная зависимость **`starlette>=0.49.1`** во всех Python-сервисах |
+| JWT на мобильных | **`flutter_secure_storage`** |
+| JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF (отдельная задача) |
+| TLS / HTTPS | Не в dev compose; на проде — reverse-proxy или Traefik ACME (см. ниже) |
+| Сканирование образов / пентест | Рекомендуется на CI/стенде (Trivy и т.п.) |
 
 ---
 
@@ -8,12 +25,12 @@
 
 | ID | Суть | Когда актуально | Устранение |
 |----|------|-----------------|------------|
-| **CVE-2025-68481** | CSRF / OAuth state в пакете **`fastapi-users`** (до 15.0.2) | Используется **`fastapi-users`** + OAuth | Обновить **`fastapi-users` ≥ 15.0.2** |
+| **CVE-2025-68481** | CSRF / OAuth state в **`fastapi-users`** (до 15.0.2) | Используется **`fastapi-users`** + OAuth | Обновить **`fastapi-users` ≥ 15.0.2** |
 | **CVE-2025-46814** | Подмена IP через **`X-Forwarded-For`** в **`fastapi-guard`** (до 2.0.0) | Используется **`fastapi-guard`** | Обновить **`fastapi-guard` ≥ 2.0.0** |
-| **CVE-2025-62727** | DoS по заголовку **`Range`** в **Starlette** `FileResponse` / `StaticFiles` (0.39.0–0.49.0) | Отдача файлов / статики через Starlette | Обновить **Starlette ≥ 0.49.1** (через обновление **FastAPI**) |
-| Зависимости | Уязвимости в **uvicorn**, **pydantic** и т.д. | Всегда | **`pip audit`** / Dependabot, регулярные обновления |
+| **CVE-2025-62727** | DoS по **`Range`** в **Starlette** `FileResponse` / `StaticFiles` (0.39.0–0.49.0) | Отдача файлов / статики через Starlette | **Сделано:** **`starlette>=0.49.1`** в `pyproject.toml` всех сервисов |
+| Зависимости | Уязвимости в **uvicorn**, **pydantic** и т.д. | Всегда | Регулярно **`pip audit`** / обновления |
 
-В наших сервисах в `pyproject.toml` указан **`fastapi`**, без **`fastapi-users`** и **`fastapi-guard`** — CVE первых двух строк относятся к экосистеме «на будущее», если эти пакеты появятся.
+В сервисах нет **`fastapi-users`** и **`fastapi-guard`** — первые две строки на будущее, если пакеты появятся.
 
 ---
 
@@ -21,64 +38,61 @@
 
 | ID | Суть | Меры |
 |----|------|------|
-| **CVE-2026-27704** | Path traversal при распаковке пакетов в **`dart pub`** (старые SDK) | Во фронте задано **`sdk: ^3.11.1`** — держать не ниже исправленной ветки; следить за **flutter-announce** |
-| **CVE-2024-54461 / CVE-2024-54462** | Плагины **`file_selector`** / **`image_picker`** на Android | Не используются в текущем `pubspec.yaml`; при добавлении — обновлять плагины |
+| **CVE-2026-27704** | Path traversal в **`dart pub`** (старые SDK) | **`sdk: ^3.11.1`** в `pubspec.yaml`; следить за **flutter-announce** |
+| **CVE-2024-54461 / CVE-2024-54462** | Плагины **`file_selector`** / **`image_picker`** на Android | Не используются; при добавлении — актуальные версии плагинов |
 
 ---
 
-## 3. Находки по текущему коду и инфраструктуре
+## 3. Инфраструктура и код (детали)
 
-| Область | Риск | Рекомендация |
-|---------|------|--------------|
-| JWT в **SharedPreferences** (web) | На Web токены в prefs — риск при XSS | Минимизация скриптов, CSP; для максимальной защиты web — отдельная схема (httpOnly cookie + BFF) |
-| JWT на **iOS/Android** | — | **Сделано:** **`flutter_secure_storage`** (Keychain / EncryptedSharedPreferences), миграция со старых prefs |
-| **CORS** | Было `allow_origins=["*"]` с `allow_credentials=True` (некорректная пара для браузеров) | **Реализовано:** список origin из **`CORS_ORIGINS`**, см. §4 |
-| **Traefik** | `--api.insecure=true`, дашборд на **8080** | **Dev:** порт **8080** слушает только **127.0.0.1**; прод: выключить insecure API, не публиковать дашборд наружу |
-| **HTTP** | В compose нет TLS | Прод: HTTPS (Traefik + сертификаты) |
-| **Секреты** | Учётные данные БД в compose | **Сделано:** **`POSTGRES_USER` / `POSTGRES_PASSWORD`** и **`JWT_SECRET`** задаются через **`.env`** (шаблон **`.env.example`**); прод: Docker secrets / vault |
-| **Dio** | Логи тел запросов | Только в **`kDebugMode`** — ок для релиза |
-| **JWT_SECRET** (identity) | Дефолт в коде, если переменная не задана | **Dev:** **`JWT_SECRET`** в **`.env`** / compose; прод: длинная случайная строка в secrets |
+| Область | Риск | Меры |
+|---------|------|------|
+| JWT в **SharedPreferences** (web) | Риск при XSS | Минимизация скриптов; максимальная защита — httpOnly cookie + BFF |
+| **Traefik** | Insecure API | Dev: **8080** на **127.0.0.1**; прод: **`docker-compose.prod.yml`** (без dashboard / insecure API) |
+| **HTTP** | Нет TLS в dev | Прод: терминация TLS перед Traefik или Traefik + ACME Let’s Encrypt |
+| **Секреты** | Утечки в git | **`.env`** + **`.env.example`**; в проде — Docker secrets / vault |
+| **Redis** | Доступ без пароля | **`REDIS_PASSWORD`** в compose и во всех сервисах |
+| **Dio** (фронт) | Логи тел запросов | Только в **`kDebugMode`** |
 
 ---
 
-## 4. Реализовано в коде: CORS
+## 4. CORS
 
-Переменная окружения **`CORS_ORIGINS`**:
+Переменная **`CORS_ORIGINS`**:
 
-- **`CORS_ORIGINS=*`** (по умолчанию, если переменная не задана) — разрешён любой origin, **`allow_credentials=False`** (корректно для `*`).
-- Список через запятую, например:  
-  `CORS_ORIGINS=http://localhost,http://127.0.0.1`  
-  — тогда **`allow_credentials=True`**, браузер может слать cookies/Authorization в сценариях с credentials.
+- **`CORS_ORIGINS=*`** (если не задана) — любой origin, **`allow_credentials=False`**.
+- Список через запятую — **`allow_credentials=True`**, например для локального UI:  
+  `http://localhost`, `http://127.0.0.1`.
 
-В **`docker-compose.yml`** для сервисов API заданы origin’ы для локального UI за Traefik (`http://localhost`, `http://127.0.0.1`). Для продакшена подставьте свой домен.
-
----
-
-## 5. План дальнейших мер (приоритеты)
-
-### P0
-
-- Регулярно: **`pip audit`** / обновления **FastAPI** и транзитивных пакетов.
-- Прод: **HTTPS**, отключение insecure API Traefik, секреты не в git.
-
-### P1
-
-- Зафиксировать в CI репозиториев **frontend** / API (если настроен) версию **Dart/Flutter** (`sdk` в `pubspec.yaml`). В репозитории **infra** CI не используется.
-- Web: при необходимости усилить хранение сессии (см. таблицу выше).
-
-### P2
-
-- Сканирование образов (**Trivy** и т.п.), пентест API на стенде.
-- При добавлении **fastapi-users** / OAuth — следить за advisory (в т.ч. CVE-2025-68481).
+В продакшене задайте реальные домены фронта в **`CORS_ORIGINS`** для каждого API-сервиса.
 
 ---
 
-## 6. Ссылки
+## 5. Продакшен: HTTPS
+
+В репозитории **нет** включённого TLS для dev (по умолчанию HTTP на порту 80). Типичные варианты:
+
+1. **Внешний балансировщик / CDN** (TLS на периметре), до Traefik — HTTP внутри сети.
+2. **Traefik + Let’s Encrypt**: entrypoint **websecure** `:443`, resolver **acme**, правила с **`Host(\`ваш-домен\`)`**, редирект HTTP→HTTPS. Сертификаты и домен настраиваются под конкретный хост (не автоматизировано в этом репозитории).
+
+После включения HTTPS имеет смысл добавить **HSTS** (например, в middleware Traefik для **websecure**).
+
+---
+
+## 6. Что остаётся процессом эксплуатации
+
+- Регулярный **`pip audit`** и обновления зависимостей в репозиториях API/фронта.
+- Сканирование образов (**Trivy** и аналоги), пентест API на стенде.
+- Политика секретов и резервного копирования БД.
+
+---
+
+## 7. Ссылки
 
 - [Flutter Security](https://github.com/flutter/flutter/security)
-- [NVD](https://nvd.nist.gov/) — поиск по CVE
-- Сообщения об уязвимостях Flutter: [g.co/vulnz](https://g.co/vulnz)
+- [NVD](https://nvd.nist.gov/)
+- [g.co/vulnz](https://g.co/vulnz)
 
 ---
 
-*Последнее обновление: CORS, Traefik dashboard на localhost, `.env.example`.*
+*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`, актуализация статуса.*

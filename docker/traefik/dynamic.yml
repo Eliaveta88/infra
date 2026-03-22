@@ -6,46 +6,53 @@ http:
       rule: PathPrefix(`/catalog`)
       priority: 100
       entryPoints: [web]
-      middlewares: [catalog-strip]
+      middlewares: [catalog-strip, security-headers]
       service: catalog-svc
     finance:
       rule: PathPrefix(`/finance`)
       priority: 100
       entryPoints: [web]
-      middlewares: [finance-strip]
+      middlewares: [finance-strip, security-headers]
       service: finance-svc
     identity:
       rule: PathPrefix(`/identity`)
       priority: 100
       entryPoints: [web]
-      middlewares: [identity-strip]
+      middlewares: [identity-strip, security-headers]
       service: identity-svc
     warehouse:
       rule: PathPrefix(`/warehouse`)
       priority: 100
       entryPoints: [web]
-      middlewares: [warehouse-strip]
+      middlewares: [warehouse-strip, security-headers]
       service: warehouse-svc
     logistics:
       rule: PathPrefix(`/logistics`)
       priority: 100
       entryPoints: [web]
-      middlewares: [logistics-strip]
+      middlewares: [logistics-strip, security-headers]
       service: logistics-svc
     orders:
       rule: PathPrefix(`/orders`)
       priority: 100
       entryPoints: [web]
-      middlewares: [orders-strip]
+      middlewares: [orders-strip, security-headers]
       service: orders-svc
     # Flutter Web (nginx), всё остальное на порту 80
     frontend:
       rule: PathPrefix(`/`)
       priority: 1
       entryPoints: [web]
+      middlewares: [security-headers]
       service: frontend-svc
 
   middlewares:
+    security-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
     catalog-strip:
       stripPrefix:
         prefixes: ["/catalog"]
