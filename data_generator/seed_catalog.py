@@ -57,7 +57,12 @@ def seed(count: int, truncate: bool) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Заполнить catalog.products")
-    p.add_argument("--count", type=int, default=10_000, help="Количество строк (по умолчанию 10000)")
+    p.add_argument(
+        "--count",
+        type=int,
+        default=10_000,
+        help="Количество строк (по умолчанию 10000)",
+    )
     p.add_argument(
         "--truncate",
         action="store_true",
