@@ -23,7 +23,9 @@ def api_base_url() -> str:
 def client(api_base_url: str) -> Generator[httpx.Client, None, None]:
     """Sync HTTP client with sane timeout."""
     timeout = float(os.environ.get("API_HTTP_TIMEOUT", "30"))
-    with httpx.Client(base_url=api_base_url, timeout=timeout, follow_redirects=True) as c:
+    with httpx.Client(
+        base_url=api_base_url, timeout=timeout, follow_redirects=True
+    ) as c:
         yield c
 
 
