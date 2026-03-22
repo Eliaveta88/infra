@@ -19,9 +19,19 @@ jobs:
   analyze-test:
     runs-on: ubuntu-latest
     steps:
+      # Не клонировать все сабмодули: иначе runner тянет каждый сервис и падает на приватных репозиториях.
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: false
+
+      # Только репозиторий фронта (не через сабмодули).
+      # Приватный фронт: в Settings → Secrets этого репо задайте GH_PAT (Contents: Read на GastroRoute_frontend).
+      # Если GH_PAT не задан, используется github.token (подходит только если фронт публичный или настроен доступ org).
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/GastroRoute_frontend
+          path: GastroRoute_frontend
+          token: ${{ secrets.GH_PAT || github.token }}
 
       - uses: subosito/flutter-action@v2
         with:
