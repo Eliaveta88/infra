@@ -71,6 +71,7 @@ services:
       context: ./GastroRoute_catalog
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/catalog
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -86,6 +87,7 @@ services:
       context: ./GastroRoute_finance
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/finance
       ORDERS_BASE_URL: http://orders:8000
       REDIS_HOST: redis
@@ -102,6 +104,7 @@ services:
       context: ./GastroRoute_identity
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/identity
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -117,6 +120,7 @@ services:
       context: ./GastroRoute_warehouse
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/warehouse
       CATALOG_BASE_URL: http://catalog:8000
       REDIS_HOST: redis
@@ -133,6 +137,7 @@ services:
       context: ./GastroRoute_logistics
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/logistics
       IDENTITY_BASE_URL: http://identity:8000
       REDIS_HOST: redis
@@ -149,6 +154,7 @@ services:
       context: ./GastroRoute_orders
       dockerfile: docker/Dockerfile
     environment:
+      CORS_ORIGINS: "http://localhost,http://127.0.0.1"
       DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/orders
       CATALOG_BASE_URL: http://catalog:8000
       IDENTITY_BASE_URL: http://identity:8000
