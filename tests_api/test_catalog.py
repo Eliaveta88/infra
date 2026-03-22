@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import uuid
 
-import pytest
-
 
 CATALOG_PREFIX = "/catalog/api/v1/catalog"
 
