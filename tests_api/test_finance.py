@@ -64,7 +64,9 @@ def test_create_transaction_requires_account(
     assert body["status"] == "pending"
 
 
-def test_create_transaction_idempotent(client, finance_client_id_with_account: int | None) -> None:
+def test_create_transaction_idempotent(
+    client, finance_client_id_with_account: int | None
+) -> None:
     if finance_client_id_with_account is None:
         pytest.skip("No finance account for client_id=1")
     key = f"idem-{uuid.uuid4()}"
