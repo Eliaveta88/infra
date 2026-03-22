@@ -6,7 +6,8 @@
 # Дашборд Traefik: http://localhost:8080/dashboard/
 #
 # Запуск: docker compose up -d --build
-# С локальными портами БД/Redis и прямым доступом к сервисам: см. docker-compose.local.yml
+# Postgres: 127.0.0.1:5432, Redis: 127.0.0.1:6379 (DBeaver, redis-cli).
+# Доп. порты сервисов на хост: см. docker-compose.local.yml
 #
 # Миграции Alembic: ENTRYPOINT в docker/Dockerfile каждого сервиса.
 # Traefik: маршруты в docker/traefik/dynamic.yml (file provider — без Docker socket API).
@@ -29,12 +30,17 @@ services:
       - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
     restart: unless-stopped
 
+  # Один контейнер Postgres, внутри — РАЗНЫЕ базы по доменам: catalog, finance, identity,
+  # warehouse, logistics, orders (см. docker/postgres/init-databases.sql и docs/database_domains.md).
+  # У каждого сервиса свой DATABASE_URL …/имя_базы — таблицы не смешиваются.
   postgres:
     image: postgres:18.3-trixie
     environment:
       POSTGRES_USER: gastro
       POSTGRES_PASSWORD: gastro
       POSTGRES_DB: catalog
+    ports:
+      - "127.0.0.1:5432:5432"
     # PG 18+: том монтируется в /var/lib/postgresql (не в …/data), см. docker-library/postgres#1259
     volumes:
       - postgres_data:/var/lib/postgresql
@@ -49,6 +55,8 @@ services:
   redis:
     image: redis:8.6.1-trixie
     command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
