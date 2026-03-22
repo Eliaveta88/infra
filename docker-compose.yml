@@ -1,0 +1,162 @@
+# GastroRoute — Postgres + Redis + Traefik + Flutter Web + 6 микросервисов.
+# UI: http://localhost/ (Flutter Web за nginx)
+# HTTP API: через Traefik → http://localhost/<service>/api/v1/...
+#   catalog → /catalog, finance → /finance, identity → /identity,
+#   warehouse → /warehouse, logistics → /logistics, orders → /orders
+# Дашборд Traefik: http://localhost:8080/dashboard/
+#
+# Запуск: docker compose up -d --build
+# С локальными портами БД/Redis и прямым доступом к сервисам: см. docker-compose.local.yml
+#
+# Миграции Alembic: ENTRYPOINT в docker/Dockerfile каждого сервиса.
+# Traefik: маршруты в docker/traefik/dynamic.yml (file provider — без Docker socket API).
+
+name: gastroroute
+
+services:
+  traefik:
+    image: traefik:v3.4
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --providers.file.watch=true
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18.3-trixie
+    environment:
+      POSTGRES_USER: gastro
+      POSTGRES_PASSWORD: gastro
+      POSTGRES_DB: catalog
+    # PG 18+: том монтируется в /var/lib/postgresql (не в …/data), см. docker-library/postgres#1259
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./docker/postgres/init-databases.sql:/docker-entrypoint-initdb.d/02-init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gastro -d catalog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.6.1-trixie
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  catalog:
+    build:
+      context: ./GastroRoute_catalog
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/catalog
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  finance:
+    build:
+      context: ./GastroRoute_finance
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/finance
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  identity:
+    build:
+      context: ./GastroRoute_identity
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/identity
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  warehouse:
+    build:
+      context: ./GastroRoute_warehouse
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/warehouse
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  logistics:
+    build:
+      context: ./GastroRoute_logistics
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/logistics
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  orders:
+    build:
+      context: ./GastroRoute_orders
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/orders
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Flutter Web (статика nginx) — в Traefik см. router `frontend` (priority 1)
+  frontend:
+    build:
+      context: ./GastroRoute_frontend
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: gastroroute_postgres_data
+  redis_data:
+    name: gastroroute_redis_data

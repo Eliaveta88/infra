@@ -1,0 +1,43 @@
+# Локальные оверрайды:
+# - Postgres и Redis на localhost
+# - прямой доступ к микросервисам (минуя Traefik), если нужно отладить контейнер
+#
+# Запуск: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  redis:
+    ports:
+      - "127.0.0.1:6379:6379"
+
+  traefik:
+    ports:
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:8080:8080"
+
+  catalog:
+    ports:
+      - "127.0.0.1:8001:8000"
+
+  finance:
+    ports:
+      - "127.0.0.1:8002:8000"
+
+  identity:
+    ports:
+      - "127.0.0.1:8003:8000"
+
+  warehouse:
+    ports:
+      - "127.0.0.1:8004:8000"
+
+  logistics:
+    ports:
+      - "127.0.0.1:8005:8000"
+
+  orders:
+    ports:
+      - "127.0.0.1:8006:8000"
