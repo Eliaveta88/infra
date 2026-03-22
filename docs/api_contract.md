@@ -288,6 +288,26 @@ Get account balance and credit limits.
 }
 ```
 
+### GET /accounts/{client_id}/revenue
+Sum of **completed** transactions with **positive** `amount` in the half-open interval **`[from, to)`** (use the same UTC bounds as the dashboard for “today”, e.g. local midnight converted to UTC).
+
+**Query parameters:**
+- `from`: ISO 8601 datetime (inclusive)
+- `to`: ISO 8601 datetime (exclusive)
+
+**Response (200):**
+```json
+{
+  "client_id": "int",
+  "total_amount": "decimal",
+  "currency": "RUB",
+  "period_from": "ISO 8601",
+  "period_to": "ISO 8601"
+}
+```
+
+**Errors:** `422` if `from >= to`.
+
 ### GET /transactions
 List transactions with pagination.
 
