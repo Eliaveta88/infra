@@ -33,11 +33,11 @@
 | JWT в **SharedPreferences** (web) | На Web токены в prefs — риск при XSS | Минимизация скриптов, CSP; для максимальной защиты web — отдельная схема (httpOnly cookie + BFF) |
 | JWT на **iOS/Android** | — | **Сделано:** **`flutter_secure_storage`** (Keychain / EncryptedSharedPreferences), миграция со старых prefs |
 | **CORS** | Было `allow_origins=["*"]` с `allow_credentials=True` (некорректная пара для браузеров) | **Реализовано:** список origin из **`CORS_ORIGINS`**, см. §4 |
-| **Traefik** | `--api.insecure=true`, порт **8080** | Прод: выключить insecure API, не публиковать дашборд наружу |
+| **Traefik** | `--api.insecure=true`, дашборд на **8080** | **Dev:** порт **8080** слушает только **127.0.0.1**; прод: выключить insecure API, не публиковать дашборд наружу |
 | **HTTP** | В compose нет TLS | Прод: HTTPS (Traefik + сертификаты) |
-| **Секреты** | Пароль БД в `docker-compose.yml` | Прод: **secrets** / `.env` вне репозитория |
+| **Секреты** | Учётные данные БД в compose | **Сделано:** **`POSTGRES_USER` / `POSTGRES_PASSWORD`** и **`JWT_SECRET`** задаются через **`.env`** (шаблон **`.env.example`**); прод: Docker secrets / vault |
 | **Dio** | Логи тел запросов | Только в **`kDebugMode`** — ок для релиза |
-| **JWT_SECRET** (identity) | Дефолт в коде для dev | Прод: задать **`JWT_SECRET`** в окружении (длинная случайная строка) |
+| **JWT_SECRET** (identity) | Дефолт в коде, если переменная не задана | **Dev:** **`JWT_SECRET`** в **`.env`** / compose; прод: длинная случайная строка в secrets |
 
 ---
 
@@ -58,12 +58,13 @@
 
 ### P0
 
-- Регулярно: **`pip audit`** / обновления **FastAPI** и транзитивных пакетов.
-- Прод: **HTTPS**, ограничение **Traefik dashboard**, секреты вне git.
+- Регулярно: **`pip audit`** / обновления **FastAPI** и транзитивных пакетов (**в CI:** `python -m pip_audit` по каждому Python-сервису).
+- Прод: **HTTPS**, отключение insecure API Traefik, секреты не в git.
 
 ### P1
 
-- Зафиксировать в CI версию **Dart/Flutter** (`sdk` в `pubspec.yaml`).
+- **Сделано в CI:** **Flutter** `analyze` + `test`, канал **stable**; проверка **`docker compose config`**.
+- Держать **`sdk`** в `pubspec.yaml` в актуальном диапазоне относительно образа в CI.
 - Web: при необходимости усилить хранение сессии (см. таблицу выше).
 
 ### P2
@@ -81,4 +82,4 @@
 
 ---
 
-*Последнее обновление: зафиксировано вместе с внедрением `CORS_ORIGINS`.*
+*Последнее обновление: CORS, Traefik dashboard на localhost, `.env.example`, CI (Flutter + pip-audit + compose).*

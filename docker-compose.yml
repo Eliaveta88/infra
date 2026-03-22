@@ -3,7 +3,9 @@
 # HTTP API: через Traefik → http://localhost/<service>/api/v1/...
 #   catalog → /catalog, finance → /finance, identity → /identity,
 #   warehouse → /warehouse, logistics → /logistics, orders → /orders
-# Дашборд Traefik: http://localhost:8080/dashboard/
+# Дашборд Traefik: http://localhost:8080/dashboard/ (порт 8080 только на 127.0.0.1)
+#
+# Переменные окружения: см. .env.example (реальные секреты — только в .env, не в git).
 #
 # Запуск: docker compose up -d --build
 # Postgres: 127.0.0.1:5432, Redis: 127.0.0.1:6379 (DBeaver, redis-cli).
@@ -36,8 +38,8 @@ services:
   postgres:
     image: postgres:18.3-trixie
     environment:
-      POSTGRES_USER: gastro
-      POSTGRES_PASSWORD: gastro
+      POSTGRES_USER: ${POSTGRES_USER:-gastro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gastro}
       POSTGRES_DB: catalog
     ports:
       - "127.0.0.1:5432:5432"
@@ -72,7 +74,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/catalog
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/catalog
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
@@ -88,7 +90,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/finance
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/finance
       ORDERS_BASE_URL: http://orders:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -105,7 +107,8 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/identity
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/identity
+      JWT_SECRET: ${JWT_SECRET:-gastroroute-dev-jwt-secret-key-min-32bytes}
       REDIS_HOST: redis
       REDIS_PORT: "6379"
     depends_on:
@@ -121,7 +124,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/warehouse
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/warehouse
       CATALOG_BASE_URL: http://catalog:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -138,7 +141,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/logistics
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/logistics
       IDENTITY_BASE_URL: http://identity:8000
       REDIS_HOST: redis
       REDIS_PORT: "6379"
@@ -155,7 +158,7 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
-      DATABASE_URL: postgresql+asyncpg://gastro:gastro@postgres:5432/orders
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-gastro}:${POSTGRES_PASSWORD:-gastro}@postgres:5432/orders
       CATALOG_BASE_URL: http://catalog:8000
       IDENTITY_BASE_URL: http://identity:8000
       REDIS_HOST: redis
