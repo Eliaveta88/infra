@@ -101,7 +101,7 @@ services:
 
   catalog:
     build:
-      context: ./GastroRoute_catalog
+      context: ./catalog
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -122,7 +122,7 @@ services:
 
   finance:
     build:
-      context: ./GastroRoute_finance
+      context: ./finance
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -144,7 +144,7 @@ services:
 
   identity:
     build:
-      context: ./GastroRoute_identity
+      context: ./identity
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -166,7 +166,7 @@ services:
 
   warehouse:
     build:
-      context: ./GastroRoute_warehouse
+      context: ./warehouse
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -188,7 +188,7 @@ services:
 
   logistics:
     build:
-      context: ./GastroRoute_logistics
+      context: ./logistics
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -210,7 +210,7 @@ services:
 
   orders:
     build:
-      context: ./GastroRoute_orders
+      context: ./orders
       dockerfile: docker/Dockerfile
     environment:
       CORS_ORIGINS: "http://localhost,http://127.0.0.1"
@@ -234,7 +234,7 @@ services:
   # Flutter Web (статика nginx) — в Traefik см. router `frontend` (priority 1)
   frontend:
     build:
-      context: ./GastroRoute_frontend
+      context: ./frontend
       dockerfile: docker/Dockerfile
     restart: unless-stopped
 
