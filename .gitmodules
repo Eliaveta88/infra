@@ -1,21 +1,21 @@
-[submodule "GastroRoute_catalog"]
-	path = GastroRoute_catalog
-	url = git@github.com:Skillportru/GastroRoute_catalog.git
-[submodule "GastroRoute_finance"]
-	path = GastroRoute_finance
-	url = git@github.com:Skillportru/GastroRoute_finance.git
-[submodule "GastroRoute_frontend"]
-	path = GastroRoute_frontend
-	url = git@github.com:Skillportru/GastroRoute_frontend.git
-[submodule "GastroRoute_identity"]
-	path = GastroRoute_identity
-	url = git@github.com:Skillportru/GastroRoute_identity.git
-[submodule "GastroRoute_logistics"]
-	path = GastroRoute_logistics
-	url = git@github.com:Skillportru/GastroRoute_logistics.git
-[submodule "GastroRoute_warehouse"]
-	path = GastroRoute_warehouse
-	url = git@github.com:Skillportru/GastroRoute_warehouse.git
-[submodule "GastroRoute_orders"]
-	path = GastroRoute_orders
-	url = git@github.com:Skillportru/GastroRoute_orders.git
+[submodule "catalog"]
+	path = catalog
+	url = git@github-eliaveta88:Eliaveta88/catalog.git
+[submodule "finance"]
+	path = finance
+	url = git@github-eliaveta88:Eliaveta88/finance.git
+[submodule "frontend"]
+	path = frontend
+	url = git@github-eliaveta88:Eliaveta88/frontend.git
+[submodule "identity"]
+	path = identity
+	url = git@github-eliaveta88:Eliaveta88/identity.git
+[submodule "logistics"]
+	path = logistics
+	url = git@github-eliaveta88:Eliaveta88/logistics.git
+[submodule "orders"]
+	path = orders
+	url = git@github-eliaveta88:Eliaveta88/orders.git
+[submodule "warehouse"]
+	path = warehouse
+	url = git@github-eliaveta88:Eliaveta88/warehouse.git
