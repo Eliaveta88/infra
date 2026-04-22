@@ -1,8 +1,12 @@
 # GastroRoute API Contract v1.0
 
-Base URL: `http://localhost:8000/api/v1`
+Base URL (через Traefik): `http://localhost/{service}/api/v1/{service}` — префикс сервиса дублируется, потому что сначала Traefik маршрутизирует по `/{service}/*`, а затем FastAPI-роутер внутри сервиса имеет prefix `/{service}`. Примеры:
 
-All responses use JSON format. Timestamps in ISO 8601.
+- `GET http://localhost/orders/api/v1/orders` — список заказов;
+- `POST http://localhost/warehouse/api/v1/warehouse/stock/reserve` — резерв;
+- `GET http://localhost/finance/api/v1/finance/accounts/{id}/balance` — баланс.
+
+Все тела — JSON, временные метки — ISO 8601.
 
 ## Architecture Pattern
 
@@ -252,8 +256,8 @@ Release previously made reservation.
 }
 ```
 
-### POST /stock/receive
-Receive new batch with expiry tracking.
+### POST /receive
+Receive new batch with expiry tracking. (Путь — именно `/receive`, без `/stock/` префикса, как в endpoints.py.)
 
 **Request:**
 ```json
@@ -364,6 +368,8 @@ Create transaction with idempotency.
 ### POST /invoices/generate
 Aggregate **orders** service data: loads each order by id via `GET /api/v1/orders/{id}`, checks `client_id` matches, sums `total_amount`, persists an **invoices** row. Requires a finance **account** for `client_id`.
 
+**Side-effects on success:** создаётся запись в `transactions` (`transaction_type="invoice"`, `status="completed"`, `idempotency_key="invoice:{invoice_id}"`) и списывается сумма со `accounts.balance` клиента. Операция идемпотентна по `invoice_id`: повторный вызов на тот же уже созданный invoice не удвоит проводку.
+
 **Request:**
 ```json
 {
@@ -415,8 +421,8 @@ List active routes.
 ]
 ```
 
-### POST /routes/plan
-Create new route.
+### POST /
+Create new route. (Путь — корень `""` в logistics-роутере, не `/routes/plan`.)
 
 **Request:**
 ```json
@@ -572,14 +578,14 @@ Update order status in pipeline.
 }
 ```
 
-**Response (200):**
-```json
-{
-  "id": "int",
-  "status": "string",
-  "updated_at": "ISO 8601"
-}
-```
+**Response (200):** полная карточка заказа (`OrderResponse`), включая `items` и `route_id`.
+
+**Side-effects:**
+
+- `status="confirmed"` (переход из не-confirmed) → orders вызывает `POST /warehouse/api/v1/warehouse/stock/reserve` по каждой позиции; при нехватке стока возвращает `409` и статус не меняется. Список полученных `reservation_id` сохраняется в Redis.
+- `status="cancelled"` (переход из не-cancelled) → orders вызывает `POST /stock/release` для ранее сохранённых резервов (best-effort).
+
+**Errors:** `404` если заказ не найден, `409` если не удалось зарезервировать сток при переходе в `confirmed`, `422` если статус неизвестен.
 
 ---
 

@@ -141,10 +141,10 @@ HTTP Response (JSON)
 ### Warehouse (`/api/v1/warehouse`)
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| GET | `/stock` | Hot stock overview |
+| GET | `""` | Stock overview (paginated) |
+| POST | `/receive` | Receive batch |
 | POST | `/stock/reserve` | Reserve batch (FEFO) |
 | POST | `/stock/release` | Release reservation |
-| POST | `/stock/receive` | Receive batch |
 
 ### Finance (`/api/v1/finance`)
 | Method | Endpoint | Purpose |
@@ -157,18 +157,18 @@ HTTP Response (JSON)
 ### Logistics (`/api/v1/logistics`)
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| GET | `/routes` | List active routes |
-| POST | `/routes/plan` | Create route |
+| GET | `""` | List active routes |
+| POST | `""` | Create route (plan) |
 | PUT | `/routes/{id}/assign` | Assign order to route |
 | PATCH | `/routes/points/{id}/status` | Update delivery status |
 
 ### Orders (`/api/v1/orders`)
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| GET | `/` | List orders |
+| GET | `""` | List orders |
 | GET | `/{id}` | Order details |
-| POST | `/` | Create order |
-| PATCH | `/{id}/status` | Update order status |
+| POST | `""` | Create order |
+| PATCH | `/{id}/status` | Update order status (orchestrates warehouse reserve/release) |
 
 ---
 
