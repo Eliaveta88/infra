@@ -9,6 +9,15 @@ CATALOG_PREFIX = "/catalog/api/v1/catalog"
 WAREHOUSE_PREFIX = "/warehouse/api/v1/warehouse"
 
 
+def test_list_stock_ok(client) -> None:
+    r = client.get(f"{WAREHOUSE_PREFIX}", params={"skip": 0, "limit": 20})
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert "items" in data
+    assert "total" in data
+    assert isinstance(data["items"], list)
+
+
 def _find_stock_by_batch_id(client, batch_id: int) -> dict | None:
     """Paginate stock list (FEFO order — new batch may be on last page)."""
     skip = 0

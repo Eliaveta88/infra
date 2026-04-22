@@ -122,3 +122,34 @@ def test_get_user_by_id(client) -> None:
 def test_get_user_by_id_not_found(client) -> None:
     r = client.get(f"{IDENTITY_PREFIX}/users/999999001")
     assert r.status_code == 404, r.text
+
+
+def test_list_users_requires_authentication(client) -> None:
+    r = client.get(f"{IDENTITY_PREFIX}/users", params={"skip": 0, "limit": 5})
+    assert r.status_code in (401, 403), r.text
+
+
+def test_list_users_with_token_returns_list_or_forbidden(client) -> None:
+    """Regular JWT may be allowed (200) or admin-only (403); never accept server errors."""
+    username, email, password = _unique_user()
+    r = client.post(
+        f"{IDENTITY_PREFIX}/users",
+        json={"username": username, "email": email, "password": password},
+    )
+    assert r.status_code == 201, r.text
+    r = client.post(
+        f"{IDENTITY_PREFIX}/login",
+        json={"username": username, "password": password},
+    )
+    assert r.status_code == 200, r.text
+    access = r.json()["access_token"]
+    r = client.get(
+        f"{IDENTITY_PREFIX}/users",
+        params={"skip": 0, "limit": 10},
+        headers={"Authorization": f"Bearer {access}"},
+    )
+    assert r.status_code in (200, 403), r.text
+    if r.status_code == 200:
+        data = r.json()
+        assert "items" in data
+        assert "total" in data

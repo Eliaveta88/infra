@@ -92,3 +92,52 @@ def test_list_orders_ok(client) -> None:
     data = r.json()
     assert "items" in data
     assert "total" in data
+
+
+def test_get_order_by_id_after_create(client) -> None:
+    username, email, password = _unique_user()
+    r = client.post(
+        f"{IDENTITY_PREFIX}/users",
+        json={"username": username, "email": email, "password": password},
+    )
+    assert r.status_code == 201, r.text
+    client_id = r.json()["id"]
+
+    suffix = uuid.uuid4().hex[:8]
+    r = client.post(
+        f"{CATALOG_PREFIX}/products",
+        json={
+            "name": f"Order Detail Product {suffix}",
+            "category": "integration",
+            "price": 11.0,
+            "sku": f"od-{suffix}",
+        },
+    )
+    assert r.status_code == 201, r.text
+    product_id = r.json()["id"]
+
+    delivery = (datetime.now(timezone.utc) + timedelta(days=10)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    r = client.post(
+        f"{ORDERS_PREFIX}",
+        json={
+            "client_id": client_id,
+            "items": [{"product_id": product_id, "quantity": 1}],
+            "delivery_date": delivery,
+        },
+    )
+    assert r.status_code == 201, r.text
+    order_id = r.json()["id"]
+
+    r = client.get(f"{ORDERS_PREFIX}/{order_id}")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["id"] == order_id
+    assert body["client_id"] == client_id
+    assert "items" in body
+    assert len(body["items"]) == 1
+    assert body["items"][0]["product_id"] == product_id
+
+
+def test_get_order_not_found(client) -> None:
+    r = client.get(f"{ORDERS_PREFIX}/999999001")
+    assert r.status_code == 404, r.text

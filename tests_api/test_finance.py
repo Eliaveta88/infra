@@ -25,6 +25,14 @@ def test_revenue_summary_ok(client) -> None:
     assert body.get("currency") == "RUB"
 
 
+def test_invoice_pdf_returns_not_implemented(client) -> None:
+    r = client.get(f"{FINANCE_PREFIX}/invoices/1/pdf")
+    assert r.status_code == 501, r.text
+    raw_detail = r.json().get("detail", "")
+    detail = raw_detail if isinstance(raw_detail, str) else str(raw_detail).lower()
+    assert "not implemented" in detail.lower() or "pdf" in detail.lower()
+
+
 def test_revenue_summary_invalid_range(client) -> None:
     r = client.get(
         f"{FINANCE_PREFIX}/accounts/1/revenue",
