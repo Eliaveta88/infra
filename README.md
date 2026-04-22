@@ -12,7 +12,9 @@
 
 3. **Запуск:** `make up` (или `docker compose -f docker-compose.yml up`).
 
-При первом старте сервис **identity** создаёт начального админа из **`ADMIN_USERNAME`** / **`ADMIN_PASSWORD`** (дефолт — `admin` / `admin`). Гостевого режима нет: фронт всегда требует логин.
+При первом старте сервис **identity** создаёт начального админа из **`ADMIN_USERNAME`** / **`ADMIN_PASSWORD`** / **`ADMIN_EMAIL`** (дефолт — `admin` / `admin` / `admin@local.dev`). Гостевого режима нет: фронт всегда требует логин.
+
+Если после обновления логин падает из‑за невалидного email в БД (например `admin@local`): `UPDATE users SET email = 'admin@local.dev' WHERE username = 'admin';` в базе **identity** (или пересоздайте том Postgres).
 
 Дашборд Traefik (`:8080`) и прямые порты сервисов на хост: второй файл **`docker-compose.local.yml`** — см. комментарий внутри него.
 
