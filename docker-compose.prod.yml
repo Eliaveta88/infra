@@ -24,3 +24,11 @@ services:
     depends_on:
       jaeger:
         condition: service_started
+
+  # В prod-сборке Flutter-фронта включаем обязательный вход + guard'ы маршрутов.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: docker/Dockerfile
+      args:
+        AUTH_ENABLED: "true"
