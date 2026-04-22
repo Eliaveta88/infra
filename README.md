@@ -20,6 +20,15 @@
 
 Нужны **Docker** (с плагином Compose) и **Git**. Для `make` — GNU Make (на Windows обычно из Git Bash).
 
+## Генератор данных (Postgres)
+
+Один прогон всех сидов (каталог → финансы → склад → заказы → логистика):
+
+- `bash scripts/run_data_generator.sh --count 10000 --truncate`  
+- или `make data-generator ARGS="--count 10000 --truncate"` (нужен bash)
+
+Подробности: [data_generator/README.md](data_generator/README.md).
+
 ## Интеграционные API-тесты
 
 Скрипт поднимает compose, ждёт health и запускает `pytest tests_api`:

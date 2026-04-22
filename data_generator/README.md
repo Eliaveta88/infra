@@ -1,5 +1,29 @@
 # Генератор данных (без Identity)
 
+## Один скрипт из корня репозитория
+
+Из каталога **`infra`** (не нужно `cd data_generator`):
+
+```bash
+bash scripts/run_data_generator.sh --count 10000 --truncate
+```
+
+Windows (PowerShell):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_data_generator.ps1 --count 10000 --truncate
+```
+
+Через **make** (Git Bash / WSL):
+
+```bash
+make data-generator ARGS="--count 10000 --truncate"
+```
+
+Обёртки ставят зависимости из `data_generator/requirements.txt` и вызывают `data_generator/run_all.py`. Аргументы те же, что у `run_all.py` (`--count`, `--truncate`).
+
+---
+
 Скрипты на **Python 3** + **psycopg2-binary** заполняют Postgres **~10 000 записей** на сервис (или заданное `--count`):
 
 | Скрипт | БД | Что вставляется |
