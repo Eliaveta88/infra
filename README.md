@@ -12,6 +12,8 @@
 
 3. **Запуск:** `make up` (или `docker compose -f docker-compose.yml up`).
 
+При первом старте сервис **identity** создаёт начального админа из **`ADMIN_USERNAME`** / **`ADMIN_PASSWORD`** (дефолт — `admin` / `admin`). Гостевого режима нет: фронт всегда требует логин.
+
 Дашборд Traefik (`:8080`) и прямые порты сервисов на хост: второй файл **`docker-compose.local.yml`** — см. комментарий внутри него.
 
 Нужны **Docker** (с плагином Compose) и **Git**. Для `make` — GNU Make (на Windows обычно из Git Bash).

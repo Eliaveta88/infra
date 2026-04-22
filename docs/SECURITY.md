@@ -84,6 +84,7 @@
 - Регулярный **`pip audit`** и обновления зависимостей в репозиториях API/фронта.
 - Сканирование образов (**Trivy** и аналоги), пентест API на стенде.
 - Политика секретов и резервного копирования БД.
+- **Начальный админ** (identity seed): при первом старте создаётся пользователь из **`ADMIN_USERNAME`** / **`ADMIN_PASSWORD`** / **`ADMIN_EMAIL`** (по умолчанию `admin` / `admin` / `admin@local`). В проде задайте свои значения и смените пароль сразу после первого входа.
 
 ---
 
@@ -95,4 +96,4 @@
 
 ---
 
-*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`.*
+*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`, initial admin seed.*

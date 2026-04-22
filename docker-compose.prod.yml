@@ -14,10 +14,4 @@ services:
       - --accesslog=true
       - --accesslog.format=json
 
-  # В prod-сборке Flutter-фронта включаем обязательный вход + guard'ы маршрутов.
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: docker/Dockerfile
-      args:
-        AUTH_ENABLED: "true"
+  # Обязательный вход включён по умолчанию в образе фронта (см. frontend/docker/Dockerfile).
