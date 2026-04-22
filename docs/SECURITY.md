@@ -15,7 +15,7 @@
 | Redis | Пароль **`REDIS_PASSWORD`** (по умолчанию dev: `devredis`), одинаковый в redis и сервисах |
 | Starlette CVE-2025-62727 (Range) | Явная зависимость **`starlette>=0.49.1`** во всех Python-сервисах |
 | JWT на мобильных | **`flutter_secure_storage`** |
-| JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF (отдельная задача) |
+| JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF, план в [BFF_JWT_COOKIE_PLAN.md](BFF_JWT_COOKIE_PLAN.md) |
 | TLS / HTTPS | Не в dev compose; на проде — reverse-proxy или Traefik ACME (см. ниже) |
 | Трейсинг запросов (Traefik) | **OpenTelemetry** → Jaeger по OTLP gRPC (`jaeger:4317`); UI **http://127.0.0.1:16686/** только на localhost; access log JSON с полями **TraceId** / **SpanId** |
 | Сканирование образов / пентест | Рекомендуется на CI/стенде (Trivy и т.п.) |
@@ -48,7 +48,7 @@
 
 | Область | Риск | Меры |
 |---------|------|------|
-| JWT в **SharedPreferences** (web) | Риск при XSS | Минимизация скриптов; максимальная защита — httpOnly cookie + BFF |
+| JWT в **SharedPreferences** (web) | Риск при XSS | Минимизация скриптов; целевая защита — httpOnly cookie + BFF (см. [BFF_JWT_COOKIE_PLAN.md](BFF_JWT_COOKIE_PLAN.md)) |
 | **Traefik** | Insecure API | Dev: **8080** на **127.0.0.1**; прод: **`docker-compose.prod.yml`** (без dashboard / insecure API) |
 | **HTTP** | Нет TLS в dev | Прод: терминация TLS перед Traefik или Traefik + ACME Let’s Encrypt |
 | **Секреты** | Утечки в git | **`.env`** + **`.env.example`**; в проде — Docker secrets / vault |
