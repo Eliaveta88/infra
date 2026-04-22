@@ -3,7 +3,6 @@
 #
 # Перед деплоем в базовом docker-compose.yml закомментируйте у traefik строку с портом 8080,
 # если не хотите слушать API на localhost. HTTPS: см. раздел «Продакшен» в docs/SECURITY.md.
-# Трейсинг (Jaeger) сохраняется; при отдельном OTLP-коллекторе замените endpoint в команде traefik.
 
 services:
   traefik:
@@ -12,18 +11,8 @@ services:
       - --providers.file.filename=/etc/traefik/dynamic.yml
       - --providers.file.watch=true
       - --entrypoints.web.address=:80
-      - --tracing=true
-      - --tracing.serviceName=gastroroute-traefik
-      - --tracing.otlp.grpc=true
-      - --tracing.otlp.grpc.endpoint=jaeger:4317
-      - --tracing.otlp.grpc.insecure=true
       - --accesslog=true
       - --accesslog.format=json
-    environment:
-      OTEL_PROPAGATORS: tracecontext,baggage
-    depends_on:
-      jaeger:
-        condition: service_started
 
   # В prod-сборке Flutter-фронта включаем обязательный вход + guard'ы маршрутов.
   frontend:

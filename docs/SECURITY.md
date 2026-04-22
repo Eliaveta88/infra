@@ -17,7 +17,6 @@
 | JWT на мобильных | **`flutter_secure_storage`** |
 | JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF, план в [BFF_JWT_COOKIE_PLAN.md](BFF_JWT_COOKIE_PLAN.md) |
 | TLS / HTTPS | Не в dev compose; на проде — reverse-proxy или Traefik ACME (см. ниже) |
-| Трейсинг запросов (Traefik) | **OpenTelemetry** → Jaeger по OTLP gRPC (`jaeger:4317`); UI **http://127.0.0.1:16686/** только на localhost; access log JSON с полями **TraceId** / **SpanId** |
 | Сканирование образов / пентест | Рекомендуется на CI/стенде (Trivy и т.п.) |
 
 ---
@@ -80,15 +79,7 @@
 
 ---
 
-## 6. Трейсинг (Traefik → Jaeger)
-
-Traefik экспортирует спаны в **Jaeger** по **OTLP gRPC** (`jaeger:4317`). В логах Traefik (stdout) access log в **JSON** содержит **TraceId** и **SpanId** для связки с Jaeger UI.
-
-Заголовки **W3C tracecontext** (`traceparent`) Traefik пробрасывает к upstream. Во всех Python API включены **OpenTelemetry** (FastAPI + OTLP gRPC в Jaeger, при наличии **httpx** — инструментирование исходящих вызовов).
-
----
-
-## 7. Что остаётся процессом эксплуатации
+## 6. Что остаётся процессом эксплуатации
 
 - Регулярный **`pip audit`** и обновления зависимостей в репозиториях API/фронта.
 - Сканирование образов (**Trivy** и аналоги), пентест API на стенде.
@@ -96,7 +87,7 @@ Traefik экспортирует спаны в **Jaeger** по **OTLP gRPC** (`j
 
 ---
 
-## 8. Ссылки
+## 7. Ссылки
 
 - [Flutter Security](https://github.com/flutter/flutter/security)
 - [NVD](https://nvd.nist.gov/)
@@ -104,4 +95,4 @@ Traefik экспортирует спаны в **Jaeger** по **OTLP gRPC** (`j
 
 ---
 
-*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`, Jaeger OTLP + Traefik tracing/access log (TraceId/SpanId).*
+*Последнее обновление: Redis auth, Traefik/nginx security headers, `starlette>=0.49.1`, `docker-compose.prod.yml`.*
