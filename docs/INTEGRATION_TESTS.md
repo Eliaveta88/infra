@@ -31,10 +31,6 @@
 | `API_BASE_URL` | База для httpx (по умолчанию `http://localhost`) |
 | `MAX_WAIT_SEC` / `$env:MAX_WAIT_SEC` | Таймаут ожидания health (по умолчанию 120) |
 
-## CI
-
-См. [`.github/workflows/integration-tests.yml`](../.github/workflows/integration-tests.yml) — ручной запуск (`workflow_dispatch`) и прогон на `push` в `main`.
-
 ## Flutter (unit / widget)
 
 Из каталога `frontend/`:

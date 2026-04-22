@@ -9,7 +9,7 @@
 | Тема | Состояние |
 |------|-----------|
 | CORS (`CORS_ORIGINS`) | Реализовано во всех API |
-| Traefik dashboard / API | Dev: порт **8080** только **127.0.0.1**; прод: `docker-compose.prod.yml` отключает dashboard и insecure API |
+| Traefik dashboard / API | Dev: порт **8080** на **127.0.0.1** через **`docker-compose.local.yml`**; в базовом compose порт не публикуется; прод: `docker-compose.prod.yml` отключает dashboard и insecure API |
 | Заголовки ответа | Traefik: middleware **security-headers**; Flutter Web: заголовки в **nginx** |
 | Секреты БД / JWT | Через **`.env`** (шаблон **`.env.example`**) |
 | Redis | Пароль **`REDIS_PASSWORD`** (по умолчанию dev: `devredis`), одинаковый в redis и сервисах |
@@ -17,7 +17,7 @@
 | JWT на мобильных | **`flutter_secure_storage`** |
 | JWT на Web | Ограничение платформы: prefs; усиление — httpOnly + BFF, план в [BFF_JWT_COOKIE_PLAN.md](BFF_JWT_COOKIE_PLAN.md) |
 | TLS / HTTPS | Не в dev compose; на проде — reverse-proxy или Traefik ACME (см. ниже) |
-| Сканирование образов / пентест | Рекомендуется на CI/стенде (Trivy и т.п.) |
+| Сканирование образов / пентест | Рекомендуется на стенде или в пайплайне деплоя (Trivy и т.п.) |
 
 ---
 
@@ -48,7 +48,7 @@
 | Область | Риск | Меры |
 |---------|------|------|
 | JWT в **SharedPreferences** (web) | Риск при XSS | Минимизация скриптов; целевая защита — httpOnly cookie + BFF (см. [BFF_JWT_COOKIE_PLAN.md](BFF_JWT_COOKIE_PLAN.md)) |
-| **Traefik** | Insecure API | Dev: **8080** на **127.0.0.1**; прод: **`docker-compose.prod.yml`** (без dashboard / insecure API) |
+| **Traefik** | Insecure API | Dev: **8080** на **127.0.0.1** через **`docker-compose.local.yml`**; прод: **`docker-compose.prod.yml`** (без dashboard / insecure API) |
 | **HTTP** | Нет TLS в dev | Прод: терминация TLS перед Traefik или Traefik + ACME Let’s Encrypt |
 | **Секреты** | Утечки в git | **`.env`** + **`.env.example`**; в проде — Docker secrets / vault |
 | **Redis** | Доступ без пароля | **`REDIS_PASSWORD`** в compose и во всех сервисах |

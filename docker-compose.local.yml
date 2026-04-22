@@ -1,5 +1,6 @@
 # Локальные оверрайды:
 # - Postgres/Redis уже проброшены в docker-compose.yml
+# - дашборд Traefik: http://127.0.0.1:8080/dashboard/ (порт 8080 не в базовом compose — без лишнего бинда в prod)
 # - прямой доступ к микросервисам (минуя Traefik), если нужно отладить контейнер
 #
 # Запуск: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
@@ -7,7 +8,6 @@
 services:
   traefik:
     ports:
-      - "127.0.0.1:80:80"
       - "127.0.0.1:8080:8080"
 
   catalog:

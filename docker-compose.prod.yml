@@ -1,8 +1,8 @@
-# Продакшен-оверлей для Traefik: без dashboard и без insecure API (порт 8080 не нужен).
+# Продакшен-оверлей для Traefik: без dashboard и без insecure API.
+# Порт 8080 в базовом compose не публикуется; для дашборда в dev используйте docker-compose.local.yml.
 # Запуск: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
-# Перед деплоем в базовом docker-compose.yml закомментируйте у traefik строку с портом 8080,
-# если не хотите слушать API на localhost. HTTPS: см. раздел «Продакшен» в docs/SECURITY.md.
+# HTTPS: см. раздел «Продакшен» в docs/SECURITY.md.
 
 services:
   traefik:

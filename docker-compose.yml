@@ -3,13 +3,13 @@
 # HTTP API: через Traefik → http://localhost/<service>/api/v1/...
 #   catalog → /catalog, finance → /finance, identity → /identity,
 #   warehouse → /warehouse, logistics → /logistics, orders → /orders
-# Дашборд Traefik: http://localhost:8080/dashboard/ (порт 8080 только на 127.0.0.1)
+# Дашборд Traefik (dev): см. docker-compose.local.yml — порт 8080 на 127.0.0.1.
 #
 # Переменные окружения: см. `.env.example` (реальные секреты — только в `.env`, не в git).
 #
 # Запуск: docker compose up -d --build
 # Postgres: 127.0.0.1:5432, Redis: 127.0.0.1:6379 (DBeaver, redis-cli).
-# Доп. порты сервисов на хост: см. docker-compose.local.yml
+# Доп. порты: дашборд Traefik и прямой доступ к API — см. docker-compose.local.yml
 #
 # Миграции Alembic: ENTRYPOINT в docker/Dockerfile каждого сервиса.
 # Traefik: маршруты в docker/traefik/dynamic.yml (file provider — без Docker socket API).
@@ -29,7 +29,6 @@ services:
       - --accesslog.format=json
     ports:
       - "80:80"
-      - "127.0.0.1:8080:8080"
     volumes:
       - ./docker/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
     restart: unless-stopped

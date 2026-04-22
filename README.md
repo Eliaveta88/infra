@@ -12,6 +12,8 @@
 
 3. **Запуск:** `make up` (или `docker compose -f docker-compose.yml up`).
 
+Дашборд Traefik (`:8080`) и прямые порты сервисов на хост: второй файл **`docker-compose.local.yml`** — см. комментарий внутри него.
+
 Нужны **Docker** (с плагином Compose) и **Git**. Для `make` — GNU Make (на Windows обычно из Git Bash).
 
 ## Интеграционные API-тесты
@@ -20,5 +22,3 @@
 
 - `make integration-tests` (через `scripts/run_integration_tests.sh`, нужен bash)
 - или вручную: см. [docs/INTEGRATION_TESTS.md](docs/INTEGRATION_TESTS.md)
-
-В CI: workflow [`.github/workflows/integration-tests.yml`](.github/workflows/integration-tests.yml) (`workflow_dispatch` и `push` в `main`).
